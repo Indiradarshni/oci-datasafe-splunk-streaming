@@ -6,12 +6,7 @@ Oracle Data Safe alerts from OCI Streaming to Splunk SIEM using HTTP Event Colle
 
 ## Architecture
 
-Oracle Data Safe  
-→ OCI Events  
-→ OCI Streaming  
-→ Service Connector Hub  
-→ OCI Functions  
-→ Splunk HEC
+Oracle Data Safe → OCI Events → OCI Streaming → Service Connector Hub → OCI Function → Splunk HEC
 
 ## Contents
 
