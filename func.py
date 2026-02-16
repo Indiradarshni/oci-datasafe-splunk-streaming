@@ -11,20 +11,20 @@ SPLUNK_HEC_TOKEN = os.environ.get("SPLUNK_HEC_TOKEN")
 
 
 def normalize_payload(data):
-    # BytesIO → bytes
+    # BytesIO to bytes
     if isinstance(data, io.BytesIO):
         data = data.read()
 
-    # gzip → bytes
+    # gzip to bytes
     if isinstance(data, (bytes, bytearray)) and data.startswith(b"\x1f\x8b"):
         with gzip.GzipFile(fileobj=io.BytesIO(data)) as f:
             data = f.read()
 
-    # bytes → str
+    # bytes to str
     if isinstance(data, (bytes, bytearray)):
         data = data.decode("utf-8")
 
-    # str → JSON
+    # str to JSON
     if isinstance(data, str):
         data = json.loads(data)
 
