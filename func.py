@@ -7,33 +7,33 @@ import sys
 import requests
 
 
-# Splunk HEC configuration (set as OCI Function environment variables)
+# Splunk HEC configuration (provided via OCI Function environment variables)
 SPLUNK_HEC_URL = os.getenv("SPLUNK_HEC_URL")
 SPLUNK_HEC_TOKEN = os.getenv("SPLUNK_HEC_TOKEN")
 
 
 def normalize_payload(data):
 
-    # BytesIO → bytes
+    # Convert BytesIO payloads to raw bytes
     if isinstance(data, io.BytesIO):
         data = data.read()
 
-    # Gzip-compressed payload → bytes
+    # Decompress gzip payloads
     if isinstance(data, (bytes, bytearray)) and data.startswith(b"\x1f\x8b"):
         with gzip.GzipFile(fileobj=io.BytesIO(data)) as f:
             data = f.read()
 
-    # Bytes → string
+    # Decode bytes to string
     if isinstance(data, (bytes, bytearray)):
         data = data.decode("utf-8")
 
-    # String → JSON
+    # Parse JSON string payloads
     if isinstance(data, str):
         data = json.loads(data)
 
     events = []
 
-    # Wrapper object with "records"
+    # Payload wrapped in a "records" array (common with OCI Streaming)
     if isinstance(data, dict) and "records" in data:
         for record in data["records"]:
             decoded = base64.b64decode(record["value"]).decode("utf-8")
@@ -55,7 +55,7 @@ def normalize_payload(data):
         decoded = base64.b64decode(data["value"]).decode("utf-8")
         return [json.loads(decoded)]
 
-    # Fallback – treat whatever remains as a single event
+    # Default case: treat the payload as a single event
     return [data]
 
 
